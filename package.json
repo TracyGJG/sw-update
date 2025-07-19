@@ -1,0 +1,33 @@
+{
+  "name": "sw-update",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "check": "./index.js",
+    "build:sw": "./index.js assets '/test.txt' '/tests'",
+    "update:na": "./index.js name",
+    "update:ma": "./index.js major",
+    "update:mi": "./index.js minor",
+    "update:p": "./index.js patch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TracyGJG/sw-update.git"
+  },
+  "keywords": [
+    "Service Worker",
+    "tool",
+    "utilies"
+  ],
+  "author": "TracyGJG",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/TracyGJG/sw-update/issues"
+  },
+  "homepage": "https://github.com/TracyGJG/sw-update#readme",
+  "description": "A utility for maintaining the assets and semver properties of a Service Worker.",
+  "dependencies": {
+    "commander": "^14.0.0"
+  }
+}
