@@ -1,7 +1,7 @@
-const appName = 'testing';
-const version = '0.0.3';
+const appName = '_';
+const version = '0.0.0';
 const staticCacheName = `${appName}_${version}`;
-const staticAssets = ['/test.txt', '/tests/test1.txt', '/tests/test2.txt'];
+const staticAssets = [];
 
 self.addEventListener('install', (evt) => {
   evt.waitUntil(

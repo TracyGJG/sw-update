@@ -4,9 +4,13 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "test": "node --test",
+    "watch": "node --test --watch",
+    "coverage": "c8 node --test",
+    "coverage:ui": "http-server ./coverage -o lcov-report/",
     "check": "./index.js",
-    "build:sw": "./index.js assets '/test.txt' '/tests'",
-    "update:na": "./index.js name",
+    "build:sw": "./index.js assets '/test.txt' '/testing'",
+    "update:na": "./index.js name 'testApp'",
     "update:ma": "./index.js major",
     "update:mi": "./index.js minor",
     "update:p": "./index.js patch"
@@ -29,5 +33,17 @@
   "description": "A utility for maintaining the assets and semver properties of a Service Worker.",
   "dependencies": {
     "commander": "^14.0.0"
+  },
+  "devDependencies": {
+    "c8": "^10.1.3",
+    "http-server": "^14.1.1"
+  },
+  "c8": {
+    "exclude": [
+      "**/*.test.*"
+    ],
+    "reporter": [
+      "lcov"
+    ]
   }
 }
