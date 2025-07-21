@@ -1,14 +1,24 @@
-import { describe, it, before, mock } from 'node:test';
+import { describe, it, beforeEach, mock } from 'node:test';
 import assert from 'node:assert';
 
 import SW_UTILS from './sw-update.js';
 
-const pathMock = {
-  join: mock.fn((...pathSections) => pathSections.join('/')),
-};
-const readdirSyncMock = mock.fn((_) => ['test3.txt', 'test4.txt']);
-const readFileSyncMock = mock.fn(() => {
-  return `
+let pathMock;
+let readdirSyncMock;
+let readFileSyncMock;
+let statSyncMock;
+let writeFileSyncMock;
+
+describe('SW Update', () => {
+  let SwUtils;
+
+  beforeEach(() => {
+    pathMock = {
+      join: mock.fn((...pathSections) => pathSections.join('/')),
+    };
+    readdirSyncMock = mock.fn((_) => ['test3.txt', 'test4.txt']);
+    readFileSyncMock = mock.fn(() => {
+      return `
 const appName = '_';
 const version = '0.0.0';
 const staticCacheName = '\${appName}_\${version}';
@@ -18,18 +28,14 @@ const staticAssets = [];
 
 SECTION THREE
 `;
-});
-const statSyncMock = mock.fn((asset) => ({
-  isFile() {
-    return asset.at(-1) !== '/';
-  },
-}));
-const writeFileSyncMock = mock.fn((_) => _);
+    });
+    statSyncMock = mock.fn((asset) => ({
+      isFile() {
+        return asset.at(-1) !== '/';
+      },
+    }));
+    writeFileSyncMock = mock.fn((_) => _);
 
-describe('SW Update', () => {
-  let SwUtils;
-
-  before(() => {
     SwUtils = SW_UTILS('tests/sw.js', {
       path: pathMock,
       readdirSync: readdirSyncMock,
@@ -78,13 +84,13 @@ describe('SW Update', () => {
   });
 
   it('facilitates updating the semver property (patch)', () => {
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 1);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 0);
 
     SwUtils.updatePatchSemver();
 
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 2);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 1);
 
-    assert.deepStrictEqual(writeFileSyncMock.mock.calls[1].arguments, [
+    assert.deepStrictEqual(writeFileSyncMock.mock.calls[0].arguments, [
       'tests/sw.js',
       '\n' +
         "const appName = '_';\n" +
@@ -100,13 +106,13 @@ describe('SW Update', () => {
   });
 
   it('facilitates updating the semver property (minor)', () => {
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 2);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 0);
 
     SwUtils.updateMinorSemver();
 
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 3);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 1);
 
-    assert.deepStrictEqual(writeFileSyncMock.mock.calls[2].arguments, [
+    assert.deepStrictEqual(writeFileSyncMock.mock.calls[0].arguments, [
       'tests/sw.js',
       '\n' +
         "const appName = '_';\n" +
@@ -122,13 +128,13 @@ describe('SW Update', () => {
   });
 
   it('facilitates updating the semver property (major)', () => {
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 3);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 0);
 
     SwUtils.updateMajorSemver();
 
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 4);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 1);
 
-    assert.deepStrictEqual(writeFileSyncMock.mock.calls[3].arguments, [
+    assert.deepStrictEqual(writeFileSyncMock.mock.calls[0].arguments, [
       'tests/sw.js',
       '\n' +
         "const appName = '_';\n" +
@@ -144,13 +150,13 @@ describe('SW Update', () => {
   });
 
   it('facilitates updating the assets (no assets)', () => {
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 4);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 0);
 
     SwUtils.processAssets();
 
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 5);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 1);
 
-    assert.deepStrictEqual(writeFileSyncMock.mock.calls[4].arguments, [
+    assert.deepStrictEqual(writeFileSyncMock.mock.calls[0].arguments, [
       'tests/sw.js',
       '\n' +
         "const appName = '_';\n" +
@@ -168,13 +174,13 @@ describe('SW Update', () => {
   });
 
   it('facilitates updating the assets (files only)', () => {
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 5);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 0);
 
     SwUtils.processAssets(['/test1.txt', '/test2.txt']);
 
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 6);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 1);
 
-    assert.deepStrictEqual(writeFileSyncMock.mock.calls[5].arguments, [
+    assert.deepStrictEqual(writeFileSyncMock.mock.calls[0].arguments, [
       'tests/sw.js',
       '\n' +
         "const appName = '_';\n" +
@@ -193,13 +199,13 @@ describe('SW Update', () => {
   });
 
   it('facilitates updating the assets (folder only)', () => {
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 6);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 0);
 
     SwUtils.processAssets(['/tests/']);
 
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 7);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 1);
 
-    assert.deepStrictEqual(writeFileSyncMock.mock.calls[6].arguments, [
+    assert.deepStrictEqual(writeFileSyncMock.mock.calls[0].arguments, [
       'tests/sw.js',
       '\n' +
         "const appName = '_';\n" +
@@ -218,13 +224,13 @@ describe('SW Update', () => {
   });
 
   it('facilitates updating the assets (files and folder)', () => {
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 7);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 0);
 
     SwUtils.processAssets(['/test1.txt', '/test2.txt', '/tests/']);
 
-    assert.strictEqual(writeFileSyncMock.mock.callCount(), 8);
+    assert.strictEqual(writeFileSyncMock.mock.callCount(), 1);
 
-    assert.deepStrictEqual(writeFileSyncMock.mock.calls[7].arguments, [
+    assert.deepStrictEqual(writeFileSyncMock.mock.calls[0].arguments, [
       'tests/sw.js',
       '\n' +
         "const appName = '_';\n" +
