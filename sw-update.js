@@ -1,4 +1,4 @@
-export default function swUtils(
+export default function (
   filePath,
   { path, readdirSync, readFileSync, statSync, writeFileSync }
 ) {
@@ -53,13 +53,13 @@ export default function swUtils(
     );
   }
 
-  function processAssets(assets) {
+  function processAssets(assets = []) {
     sections[1] = `
-\t${pullAssets(assets)
-      .flat()
-      .map((_) => `"${_}"`)
-      .join(',\n\t')}
-`;
+  \t${pullAssets(assets)
+    .flat()
+    .map((_) => `"${_}"`)
+    .join(',\n\t')}
+  `;
     writeSW();
   }
 
@@ -70,7 +70,7 @@ export default function swUtils(
 
       return stats.isFile()
         ? [asset]
-        : readdirSync(assetPath, 'utf8').map((_) => `${asset}/${_}`);
+        : readdirSync(assetPath, 'utf8').map((_) => `${asset}${_}`);
     });
   }
 

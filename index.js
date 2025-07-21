@@ -5,11 +5,11 @@ import path from 'path';
 
 import { Command } from 'commander';
 
-import swUtils from './sw-update.js';
+import SW_UTILS from './sw-update.js';
 
 const program = new Command();
 
-const SwUtils = swUtils(path.join(process.cwd(), 'sw.js'), {
+const SwUtils = SW_UTILS(path.join(process.cwd(), 'sw.js'), {
   path,
   readdirSync,
   readFileSync,
