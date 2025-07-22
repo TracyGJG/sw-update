@@ -1,24 +1,14 @@
-import { describe, it, beforeEach, mock } from 'node:test';
+import { describe, it, afterEach, before, mock } from 'node:test';
 import assert from 'node:assert';
 
 import SW_UTILS from './sw-update.js';
 
-let pathMock;
-let readdirSyncMock;
-let readFileSyncMock;
-let statSyncMock;
-let writeFileSyncMock;
-
-describe('SW Update', () => {
-  let SwUtils;
-
-  beforeEach(() => {
-    pathMock = {
-      join: mock.fn((...pathSections) => pathSections.join('/')),
-    };
-    readdirSyncMock = mock.fn((_) => ['test3.txt', 'test4.txt']);
-    readFileSyncMock = mock.fn(() => {
-      return `
+const pathMock = {
+  join: mock.fn((...pathSections) => pathSections.join('/')),
+};
+const readdirSyncMock = mock.fn((_) => ['test3.txt', 'test4.txt']);
+const readFileSyncMock = mock.fn(() => {
+  return `
 const appName = '_';
 const version = '0.0.0';
 const staticCacheName = '\${appName}_\${version}';
@@ -28,14 +18,22 @@ const staticAssets = [];
 
 SECTION THREE
 `;
-    });
-    statSyncMock = mock.fn((asset) => ({
-      isFile() {
-        return asset.at(-1) !== '/';
-      },
-    }));
-    writeFileSyncMock = mock.fn((_) => _);
+});
+const statSyncMock = mock.fn((asset) => ({
+  isFile() {
+    return asset.at(-1) !== '/';
+  },
+}));
+const writeFileSyncMock = mock.fn((_) => _);
 
+describe('SW Update', () => {
+  let SwUtils;
+
+  afterEach(() => {
+    writeFileSyncMock.mock.resetCalls();
+  });
+
+  before(() => {
     SwUtils = SW_UTILS('tests/sw.js', {
       path: pathMock,
       readdirSync: readdirSyncMock,
